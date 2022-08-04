@@ -2,45 +2,46 @@ part of 'chat_bloc.dart';
 
 @immutable
 abstract class ChatState {
-  final String? currentUserId;
-  final List<User> registeredUsers;
-  final List<Message> messages;
+  final ChatUser? sender;
+  final ChatRoomMetadata? chatRoom;
+  final List<ChatMessage> messages;
 
   const ChatState({
+    required this.sender,
+    required this.chatRoom,
     required this.messages,
-    required this.currentUserId,
-    required this.registeredUsers,
   });
 }
 
+@immutable
 class ChatInitial extends ChatState {
   const ChatInitial()
       : super(
-          currentUserId: null,
+          chatRoom: null,
+          sender: null,
           messages: const [],
-          registeredUsers: const [],
         );
 }
 
-class ChatLoading extends ChatState {
-  const ChatLoading({
-    required List<User> registeredUsers,
-    required String currentUserId,
-  }) : super(
-          currentUserId: currentUserId,
+@immutable
+class ChatUserAvailable extends ChatState {
+  const ChatUserAvailable({required ChatUser sender})
+      : super(
+          chatRoom: null,
+          sender: sender,
           messages: const [],
-          registeredUsers: registeredUsers,
         );
 }
 
-class ChatAvailable extends ChatState {
-  const ChatAvailable({
-    required List<User> registeredUsers,
-    required String currentUserId,
-    required List<Message> messages,
+@immutable
+class ChatRoomAvailable extends ChatState {
+  const ChatRoomAvailable({
+    required ChatUser sender,
+    required ChatRoomMetadata chatRoom,
+    required List<ChatMessage> messages,
   }) : super(
-          currentUserId: currentUserId,
+          chatRoom: chatRoom,
+          sender: sender,
           messages: messages,
-          registeredUsers: registeredUsers,
         );
 }
