@@ -25,7 +25,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.repository,
   }) : super(const ChatInitial()) {
     on<ChatLogin>(
-      (event, emit) => emit(ChatUserAvailable(sender: event.user)),
+      (event, emit) {
+        emit(ChatUserAvailable(sender: event.user));
+        add(ChatRoomSelected("chatRoomId"));
+      },
     );
     on<ChatLogout>(
       (event, emit) => emit(const ChatInitial()),
@@ -82,9 +85,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ChatRoomSelected event,
     Emitter<ChatState> emit,
   ) async {
-    if (state is! ChatRoomAvailable) {
+    if (state is! ChatRoomAvailable && state is! ChatUserAvailable) {
       logger.warn(
-          "State transition 'ChatRoomSelected' is only valid from state 'ChatRoomAvailable'");
+          "State transition 'ChatRoomSelected' is only valid from either 'ChatRoomAvailable' or 'ChatUserAvailable'");
       return;
     }
 
