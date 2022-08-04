@@ -18,7 +18,7 @@ class ChatPage extends StatelessWidget {
         child: BlocSelector<ChatBloc, ChatState, ChatUser?>(
           selector: (state) => state.sender,
           builder: (context, state) {
-            if (state is ChatInitial) return const ChatLoadingView();
+            if (state == null) return const ChatLoadingView();
 
             return const ChatMainView();
           },

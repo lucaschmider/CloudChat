@@ -8,7 +8,8 @@ abstract class ChatEvent {
 @immutable
 class ChatLogin extends ChatEvent {
   final ChatUser user;
-  const ChatLogin(this.user);
+  final List<ChatRoomOption> chatRoomOptions;
+  const ChatLogin(this.user, this.chatRoomOptions);
 }
 
 class ChatLogout extends ChatEvent {}

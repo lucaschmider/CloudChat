@@ -5,11 +5,13 @@ abstract class ChatState {
   final ChatUser? sender;
   final ChatRoomMetadata? chatRoom;
   final List<ChatMessage> messages;
+  final List<ChatRoomOption> chatRoomOptions;
 
   const ChatState({
     required this.sender,
     required this.chatRoom,
     required this.messages,
+    required this.chatRoomOptions,
   });
 }
 
@@ -20,16 +22,20 @@ class ChatInitial extends ChatState {
           chatRoom: null,
           sender: null,
           messages: const [],
+          chatRoomOptions: const [],
         );
 }
 
 @immutable
 class ChatUserAvailable extends ChatState {
-  const ChatUserAvailable({required ChatUser sender})
-      : super(
+  const ChatUserAvailable({
+    required ChatUser sender,
+    required List<ChatRoomOption> chatRoomOptions,
+  }) : super(
           chatRoom: null,
           sender: sender,
           messages: const [],
+          chatRoomOptions: chatRoomOptions,
         );
 }
 
@@ -39,9 +45,11 @@ class ChatRoomAvailable extends ChatState {
     required ChatUser sender,
     required ChatRoomMetadata chatRoom,
     required List<ChatMessage> messages,
+    required List<ChatRoomOption> chatRoomOptions,
   }) : super(
           chatRoom: chatRoom,
           sender: sender,
           messages: messages,
+          chatRoomOptions: chatRoomOptions,
         );
 }

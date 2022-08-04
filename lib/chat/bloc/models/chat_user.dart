@@ -1,3 +1,4 @@
+import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
 import 'package:flutter/material.dart';
 
 @immutable

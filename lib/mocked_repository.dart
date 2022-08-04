@@ -1,8 +1,10 @@
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
+import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
 import 'package:cloud_chat/chat/bloc/models/initial_chat_room_state.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_user.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
+import 'package:cloud_chat/chat/bloc/models/user_changed_event.dart';
 
 class MockedRepository implements ChatRepository {
   @override
@@ -72,13 +74,32 @@ class MockedRepository implements ChatRepository {
   }
 
   @override
-  Stream<ChatUser?> getUserStream() async* {
-    yield null;
+  Stream<UserChangedEvent> getUserStream() async* {
+    yield const UserChangedEvent(null, null);
 
     await Future.delayed(const Duration(microseconds: 3));
-    yield const ChatUser(
-      userId: "3e2d2fa3-be75-471e-99b4-8163b2ac334d",
-      name: "Max Mustermann",
-    );
+    yield const UserChangedEvent(
+        ChatUser(
+          userId: "3e2d2fa3-be75-471e-99b4-8163b2ac334d",
+          name: "Max Mustermann",
+        ),
+        [
+          ChatRoomOption(
+              isSelected: false,
+              chatRoomId: "6ab3b017-c7fe-42f0-a5e3-97951cdf39f6",
+              name: "Lörrach"),
+          ChatRoomOption(
+              isSelected: false,
+              chatRoomId: "fa23a2fb-edf5-407b-9061-c93ae4834fcc",
+              name: "VEGA Global"),
+          ChatRoomOption(
+              isSelected: false,
+              chatRoomId: "bc790e68-b5d0-4c3c-914f-8ec1730a49e0",
+              name: "Neue Konzepte"),
+          ChatRoomOption(
+              isSelected: false,
+              chatRoomId: "56ac6157-d74d-4d8c-9e59-81c937898cb6",
+              name: "Felix Sommerer"),
+        ]);
   }
 }

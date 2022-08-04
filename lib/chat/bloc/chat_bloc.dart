@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
+import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../logger.dart';
@@ -26,8 +27,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }) : super(const ChatInitial()) {
     on<ChatLogin>(
       (event, emit) {
-        emit(ChatUserAvailable(sender: event.user));
-        add(ChatRoomSelected("chatRoomId"));
+        emit(ChatUserAvailable(
+          sender: event.user,
+          chatRoomOptions: event.chatRoomOptions,
+        ));
       },
     );
     on<ChatLogout>(
@@ -38,13 +41,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ChatMessageAdded>(_handleChatMessageAdded);
     on<ChatRoomChanged>(
       (event, emit) => emit(ChatRoomAvailable(
-          sender: state.sender!,
-          chatRoom: event.chatRoom,
-          messages: state.messages)),
+        sender: state.sender!,
+        chatRoom: event.chatRoom,
+        messages: state.messages,
+        chatRoomOptions: state.chatRoomOptions,
+      )),
     );
 
-    userSubscription = repository.getUserStream().listen(
-        (event) => event != null ? add(ChatLogin(event)) : add(ChatLogout()));
+    userSubscription = repository.getUserStream().listen((event) =>
+        event.user != null
+            ? add(ChatLogin(event.user!, event.chatRoomOptions!))
+            : add(ChatLogout()));
   }
 
   void _handleChatRoomRetrieved(
@@ -64,6 +71,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       sender: state.sender!,
       chatRoom: event.chatRoom,
       messages: event.messages,
+      chatRoomOptions: state.chatRoomOptions,
     ));
   }
 
@@ -78,6 +86,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       sender: state.sender!,
       chatRoom: state.chatRoom!,
       messages: [...state.messages, event.message],
+      chatRoomOptions: state.chatRoomOptions,
     ));
   }
 
@@ -94,7 +103,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     messageSubscription?.cancel();
     metadataSubscription?.cancel();
 
-    emit(ChatUserAvailable(sender: state.sender!));
+    emit(ChatUserAvailable(
+      sender: state.sender!,
+      chatRoomOptions: state.chatRoomOptions
+          .map((e) => ChatRoomOption(
+                isSelected: e.chatRoomId == event.chatRoomId,
+                chatRoomId: e.chatRoomId,
+                name: e.name,
+              ))
+          .toList(),
+    ));
     final initialState = await repository.getChatRoom(event.chatRoomId);
     add(ChatRoomRetrieved(
       chatRoom: initialState.metadata,
