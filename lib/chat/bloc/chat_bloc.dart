@@ -18,6 +18,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   StreamSubscription? messageSubscription;
   StreamSubscription? metadataSubscription;
+  late final StreamSubscription userSubscription;
 
   ChatBloc({
     required this.logger,
@@ -29,13 +30,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ChatLogout>(
       (event, emit) => emit(const ChatInitial()),
     );
-    on<ChatRoomRetrieved>(
-      (event, emit) => emit(ChatRoomAvailable(
-        sender: state.sender!,
-        chatRoom: event.chatRoom,
-        messages: event.messages,
-      )),
-    );
+    on<ChatRoomRetrieved>(_handleChatRoomRetrieved);
     on<ChatRoomSelected>(_handleChatRoomSelected);
     on<ChatMessageAdded>(_handleChatMessageAdded);
     on<ChatRoomChanged>(
@@ -44,10 +39,38 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           chatRoom: event.chatRoom,
           messages: state.messages)),
     );
+
+    userSubscription = repository.getUserStream().listen(
+        (event) => event != null ? add(ChatLogin(event)) : add(ChatLogout()));
+  }
+
+  void _handleChatRoomRetrieved(
+      ChatRoomRetrieved event, Emitter<ChatState> emit) {
+    if (state is! ChatUserAvailable) {
+      logger.warn(
+          "State transition 'ChatRoomRetrieved' is only valid from state 'ChatUserAvailable'");
+      return;
+    }
+    messageSubscription = repository
+        .getMessageStream(event.chatRoom.chatRoomId)
+        .listen((event) => add(ChatMessageAdded(event)));
+    metadataSubscription = repository
+        .getMetadataStream(event.chatRoom.chatRoomId)
+        .listen((event) => add(ChatRoomChanged(event)));
+    emit(ChatRoomAvailable(
+      sender: state.sender!,
+      chatRoom: event.chatRoom,
+      messages: event.messages,
+    ));
   }
 
   void _handleChatMessageAdded(event, emit) {
-    if (state is! ChatRoomAvailable) return;
+    if (state is! ChatRoomAvailable) {
+      logger.warn(
+          "State transition 'ChatMessageAdded' is only valid from state 'ChatRoomAvailable'");
+      return;
+    }
+
     emit(ChatRoomAvailable(
       sender: state.sender!,
       chatRoom: state.chatRoom!,
@@ -59,6 +82,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ChatRoomSelected event,
     Emitter<ChatState> emit,
   ) async {
-    final initialState
+    if (state is! ChatRoomAvailable) {
+      logger.warn(
+          "State transition 'ChatRoomSelected' is only valid from state 'ChatRoomAvailable'");
+      return;
+    }
+
+    messageSubscription?.cancel();
+    metadataSubscription?.cancel();
+
+    emit(ChatUserAvailable(sender: state.sender!));
+    final initialState = await repository.getChatRoom(event.chatRoomId);
+    add(ChatRoomRetrieved(
+      chatRoom: initialState.metadata,
+      messages: initialState.messages,
+    ));
   }
 }

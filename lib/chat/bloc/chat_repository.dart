@@ -1,5 +1,6 @@
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
+import 'package:cloud_chat/chat/bloc/models/chat_user.dart';
 import 'package:cloud_chat/chat/bloc/models/initial_chat_room_state.dart';
 
 abstract class ChatRepository {
@@ -8,4 +9,5 @@ abstract class ChatRepository {
 
   Stream<ChatMessage> getMessageStream(String chatRoomId);
   Stream<ChatRoomMetadata> getMetadataStream(String chatRoomId);
+  Stream<ChatUser?> getUserStream();
 }
