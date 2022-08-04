@@ -43,9 +43,10 @@ class MockedRepository implements ChatRepository {
   @override
   Stream<ChatMessage> getMessageStream(String chatRoomId) {
     return Stream.periodic(
-      const Duration(seconds: 10),
+      const Duration(seconds: 1),
       (counter) => ChatMessage(
-        text: "Lorem Ipsum",
+        text:
+            "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
         userId: "b2e88437-a8fc-4447-91fb-784b6c3c1265",
         timestamp: DateTime.now(),
       ),
@@ -74,7 +75,7 @@ class MockedRepository implements ChatRepository {
   Stream<ChatUser?> getUserStream() async* {
     yield null;
 
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(microseconds: 3));
     yield const ChatUser(
       userId: "3e2d2fa3-be75-471e-99b4-8163b2ac334d",
       name: "Max Mustermann",

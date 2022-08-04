@@ -12,6 +12,7 @@ class CloudChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
+        theme: ThemeData.dark(),
         home: MultiRepositoryProvider(
           providers: [
             RepositoryProvider<ChatRepository>(
