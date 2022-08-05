@@ -47,11 +47,28 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         chatRoomOptions: state.chatRoomOptions,
       )),
     );
+    on<ChatTextSent>(_handleChatTextSent);
 
     userSubscription = repository.getUserStream().listen((event) =>
         event.user != null
             ? add(ChatLogin(event.user!, event.chatRoomOptions!))
             : add(ChatLogout()));
+  }
+
+  void _handleChatTextSent(event, emit) {
+    if (state is! ChatRoomAvailable) {
+      logger.warn(
+          "State transition 'ChatTextSent' is only valid from state 'ChatRoomAvailable'");
+      return;
+    }
+    repository.createMessage(
+      state.chatRoom!.chatRoomId,
+      ChatMessage(
+        text: event.message,
+        userId: state.sender!.userId,
+        timestamp: DateTime.now(),
+      ),
+    );
   }
 
   void _handleChatRoomRetrieved(

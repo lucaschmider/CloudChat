@@ -37,3 +37,8 @@ class ChatRoomChanged extends ChatEvent {
   final ChatRoomMetadata chatRoom;
   const ChatRoomChanged(this.chatRoom);
 }
+
+class ChatTextSent extends ChatEvent {
+  final String message;
+  const ChatTextSent(this.message);
+}

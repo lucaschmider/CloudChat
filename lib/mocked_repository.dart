@@ -7,10 +7,11 @@ import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:cloud_chat/chat/bloc/models/user_changed_event.dart';
 
 class MockedRepository implements ChatRepository {
+  final outboundBuffer = <ChatMessage>[];
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
-    // TODO: implement createMessage
-    throw UnimplementedError();
+    outboundBuffer.add(message);
+    return Future.value();
   }
 
   @override
@@ -43,16 +44,22 @@ class MockedRepository implements ChatRepository {
   }
 
   @override
-  Stream<ChatMessage> getMessageStream(String chatRoomId) {
-    return Stream.periodic(
-      const Duration(seconds: 1),
-      (counter) => ChatMessage(
+  Stream<ChatMessage> getMessageStream(String chatRoomId) async* {
+    while (true) {
+      while (outboundBuffer.isNotEmpty) {
+        final message = outboundBuffer.removeAt(0);
+        yield message;
+      }
+
+      yield ChatMessage(
         text:
             "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
         userId: "b2e88437-a8fc-4447-91fb-784b6c3c1265",
         timestamp: DateTime.now(),
-      ),
-    );
+      );
+
+      await Future.delayed(const Duration(seconds: 1));
+    }
   }
 
   @override
