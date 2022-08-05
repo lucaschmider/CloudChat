@@ -26,7 +26,9 @@ class ChatMessageView extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
+                  color: isFromAnotherParticipant
+                      ? Theme.of(context).colorScheme.surface
+                      : Theme.of(context).colorScheme.primary,
                   borderRadius: isFromAnotherParticipant
                       ? const BorderRadius.only(
                           topLeft: Radius.circular(8.0),
@@ -43,6 +45,11 @@ class ChatMessageView extends StatelessWidget {
                   padding: const EdgeInsets.all(14.0),
                   child: Text(
                     message.text,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: isFromAnotherParticipant
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Theme.of(context).colorScheme.onPrimary,
+                        ),
                   ),
                 ),
               ),

@@ -8,6 +8,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/chat_bloc.dart';
 import '../bloc/models/chat_message.dart';
 
+@immutable
+class _RelevantBlocSubset {
+  final List<ChatMessage> messages;
+  final String ownUserId;
+
+  const _RelevantBlocSubset({
+    required this.messages,
+    required this.ownUserId,
+  });
+}
+
 class ChatRoomView extends StatelessWidget {
   const ChatRoomView({Key? key}) : super(key: key);
 
@@ -19,15 +30,20 @@ class ChatRoomView extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: BlocSelector<ChatBloc, ChatState, List<ChatMessage>>(
-                  selector: (state) => state.messages,
+                child: BlocSelector<ChatBloc, ChatState, _RelevantBlocSubset>(
+                  selector: (state) => _RelevantBlocSubset(
+                      messages: state.messages,
+                      ownUserId: state.sender!.userId),
                   builder: (context, state) => ListView.builder(
                     itemBuilder: (context, index) {
-                      final message = state.elementAt(index);
+                      final message = state.messages.elementAt(index);
                       return ChatMessageView(
-                          message: message, isFromAnotherParticipant: false);
+                        message: message,
+                        isFromAnotherParticipant:
+                            message.userId != state.ownUserId,
+                      );
                     },
-                    itemCount: state.length,
+                    itemCount: state.messages.length,
                   ),
                 ),
               ),
