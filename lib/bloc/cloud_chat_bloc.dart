@@ -15,7 +15,7 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
   final BackendConnectorRepository connectorRepository;
   final Logger logger;
   StreamSubscription? signOutSubscription;
-  AuthentificationRepository? authentificationRepository;
+  AuthenticationRepository? authentificationRepository;
 
   CloudChatBloc({
     required this.connectorRepository,
@@ -107,7 +107,7 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     signOutSubscription?.cancel();
     final connector =
         state.availableConnectors.singleWhere((con) => con.name == event.name);
-    authentificationRepository = connector.authentificationRepository();
+    authentificationRepository = connector.authenticationRepository();
 
     signOutSubscription = authentificationRepository!
         .createSignOutStream()

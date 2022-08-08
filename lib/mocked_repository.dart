@@ -13,7 +13,7 @@ import 'package:cloud_chat/chat/bloc/models/user_changed_event.dart';
 class MockedRepository
     implements
         ChatRepository,
-        AuthentificationRepository,
+        AuthenticationRepository,
         BackendConnectorRepository {
   final outboundBuffer = <ChatMessage>[];
   @override
@@ -130,13 +130,13 @@ class MockedRepository
         name: "Mocked",
         assetName: "anchor.svg",
         chatRepositoryFactory: () => this,
-        authentificationRepository: () => this,
+        authenticationRepository: () => this,
       ),
       BackendConnector(
         name: "Firebase",
         assetName: "layers.svg",
         chatRepositoryFactory: () => this,
-        authentificationRepository: () => this,
+        authenticationRepository: () => this,
       ),
     ];
   }

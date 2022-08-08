@@ -1,6 +1,6 @@
 import 'package:cloud_chat/bloc/models/authentification_result.dart';
 
-abstract class AuthentificationRepository {
+abstract class AuthenticationRepository {
   Future<AuthentificationResult> signInWithUsernameAndPasswordAsync(
     String username,
     String password,

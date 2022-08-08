@@ -7,12 +7,12 @@ class BackendConnector {
   final String name;
   final String assetName;
   final ChatRepository Function() chatRepositoryFactory;
-  final AuthentificationRepository Function() authentificationRepository;
+  final AuthenticationRepository Function() authenticationRepository;
 
   const BackendConnector({
     required this.name,
     required this.assetName,
     required this.chatRepositoryFactory,
-    required this.authentificationRepository,
+    required this.authenticationRepository,
   });
 }
