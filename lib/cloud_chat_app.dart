@@ -1,10 +1,13 @@
+import 'package:cloud_chat/bloc/backend_connector_repository.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
 import 'package:cloud_chat/chat/chat_page.dart';
 import 'package:cloud_chat/console_logger.dart';
 import 'package:cloud_chat/mocked_repository.dart';
+import 'package:cloud_chat/views/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/cloud_chat_bloc.dart';
 import 'logger.dart';
 
 class CloudChatApp extends StatelessWidget {
@@ -26,11 +29,29 @@ class CloudChatApp extends StatelessWidget {
         ),
         home: MultiRepositoryProvider(
           providers: [
-            RepositoryProvider<ChatRepository>(
+            RepositoryProvider<BackendConnectorRepository>(
                 create: (context) => MockedRepository()),
             RepositoryProvider<Logger>(create: (context) => ConsoleLogger()),
           ],
-          child: const ChatPage(),
+          child: BlocProvider(
+            create: (context) => CloudChatBloc(
+              connectorRepository: context.read(),
+              logger: context.read(),
+            ),
+            child: BlocBuilder<CloudChatBloc, CloudChatState>(
+              builder: (context, state) {
+                if (state is CloudChatSignedIn) {
+                  return RepositoryProvider<ChatRepository>(
+                    create: (context) =>
+                        state.connector!.chatRepositoryFactory(),
+                    child: const ChatPage(),
+                  );
+                }
+
+                return const LoginPage();
+              },
+            ),
+          ),
         ),
       );
 }

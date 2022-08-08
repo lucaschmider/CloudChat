@@ -136,4 +136,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       messages: initialState.messages,
     ));
   }
+
+  @override
+  Future<void> close() {
+    userSubscription.cancel();
+    messageSubscription?.cancel();
+
+    return super.close();
+  }
 }

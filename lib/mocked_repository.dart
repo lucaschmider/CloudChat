@@ -1,3 +1,7 @@
+import 'package:cloud_chat/bloc/authentification_repository.dart';
+import 'package:cloud_chat/bloc/backend_connector_repository.dart';
+import 'package:cloud_chat/bloc/models/authentification_result.dart';
+import 'package:cloud_chat/bloc/models/backend_connector.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
 import 'package:cloud_chat/chat/bloc/models/initial_chat_room_state.dart';
@@ -6,7 +10,11 @@ import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:cloud_chat/chat/bloc/models/user_changed_event.dart';
 
-class MockedRepository implements ChatRepository {
+class MockedRepository
+    implements
+        ChatRepository,
+        AuthentificationRepository,
+        BackendConnectorRepository {
   final outboundBuffer = <ChatMessage>[];
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
@@ -108,5 +116,50 @@ class MockedRepository implements ChatRepository {
               chatRoomId: "56ac6157-d74d-4d8c-9e59-81c937898cb6",
               name: "Felix Sommerer"),
         ]);
+  }
+
+  @override
+  Stream<void> createSignOutStream() {
+    return const Stream.empty();
+  }
+
+  @override
+  List<BackendConnector> getAvailableConnectors() {
+    return [
+      BackendConnector(
+        name: "Mocked",
+        assetName: "anchor.svg",
+        chatRepositoryFactory: () => this,
+        authentificationRepository: () => this,
+      ),
+      BackendConnector(
+        name: "Firebase",
+        assetName: "layers.svg",
+        chatRepositoryFactory: () => this,
+        authentificationRepository: () => this,
+      ),
+    ];
+  }
+
+  @override
+  Future<AuthentificationResult> signInWithGoogleAsync() {
+    return Future.value(AuthentificationResult.success);
+  }
+
+  @override
+  Future<AuthentificationResult> signInWithUsernameAndPasswordAsync(
+      String username, String password) {
+    return Future.value(AuthentificationResult.success);
+  }
+
+  @override
+  Future<void> signOut() {
+    return Future.value();
+  }
+
+  @override
+  Future<AuthentificationResult> signUpWithUsernameAndPassword(
+      String username, String email, String fullName) {
+    return Future.value(AuthentificationResult.success);
   }
 }

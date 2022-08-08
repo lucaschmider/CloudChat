@@ -1,3 +1,4 @@
+import 'package:cloud_chat/chat/bloc/chat_repository.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_user.dart';
 import 'package:cloud_chat/chat/views/chat_loading_view.dart';
 import 'package:cloud_chat/chat/views/chat_main_view.dart';
