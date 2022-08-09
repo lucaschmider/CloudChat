@@ -2,12 +2,13 @@ import 'package:cloud_chat/bloc/backend_connector_repository.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
 import 'package:cloud_chat/chat/chat_page.dart';
 import 'package:cloud_chat/console_logger.dart';
-import 'package:cloud_chat/mocked_repository.dart';
-import 'package:cloud_chat/views/login_page.dart';
+import 'package:cloud_chat/views/initialization_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/cloud_chat_bloc.dart';
+import 'implementations/backend_connector_repository.dart';
 import 'logger.dart';
 
 class CloudChatApp extends StatelessWidget {
@@ -30,7 +31,7 @@ class CloudChatApp extends StatelessWidget {
         home: MultiRepositoryProvider(
           providers: [
             RepositoryProvider<BackendConnectorRepository>(
-                create: (context) => MockedRepository()),
+                create: (context) => BackendConnectorRegistry()),
             RepositoryProvider<Logger>(create: (context) => ConsoleLogger()),
           ],
           child: BlocProvider(
@@ -48,7 +49,7 @@ class CloudChatApp extends StatelessWidget {
                   );
                 }
 
-                return const LoginPage();
+                return const InitializationPage();
               },
             ),
           ),

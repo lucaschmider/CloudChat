@@ -10,11 +10,7 @@ import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:cloud_chat/chat/bloc/models/user_changed_event.dart';
 
-class MockedRepository
-    implements
-        ChatRepository,
-        AuthenticationRepository,
-        BackendConnectorRepository {
+class FirebaseRepository implements ChatRepository, AuthenticationRepository {
   final outboundBuffer = <ChatMessage>[];
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
@@ -60,8 +56,7 @@ class MockedRepository
       }
 
       yield ChatMessage(
-        text:
-            "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+        text: "Firebase",
         userId: "b2e88437-a8fc-4447-91fb-784b6c3c1265",
         timestamp: DateTime.now(),
       );
@@ -121,24 +116,6 @@ class MockedRepository
   @override
   Stream<void> createSignOutStream() {
     return const Stream.empty();
-  }
-
-  @override
-  List<BackendConnector> getAvailableConnectors() {
-    return [
-      BackendConnector(
-        name: "Mocked",
-        assetName: "anchor.svg",
-        chatRepositoryFactory: () => this,
-        authenticationRepository: () => this,
-      ),
-      BackendConnector(
-        name: "Firebase",
-        assetName: "layers.svg",
-        chatRepositoryFactory: () => this,
-        authenticationRepository: () => this,
-      ),
-    ];
   }
 
   @override

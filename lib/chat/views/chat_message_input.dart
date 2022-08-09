@@ -5,6 +5,8 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../views/custom_text_input.dart';
+
 class ChatMessageInput extends StatefulWidget {
   const ChatMessageInput({Key? key}) : super(key: key);
 
@@ -17,25 +19,17 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: TextField(
+        child: CustomTextInput(
           controller: _controller,
-          decoration: InputDecoration(
-            hintText: "Nachricht eingeben",
-            border: const OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            ),
-            fillColor: Theme.of(context).colorScheme.surface,
-            filled: true,
-            suffixIcon: IconButton(
-              onPressed: () {
-                context.read<ChatBloc>().add(
-                      ChatTextSent(_controller.text),
-                    );
-                _controller.clear();
-              },
-              icon: const Icon(Icons.send),
-            ),
+          hintText: "Nachricht eingeben",
+          suffixIcon: IconButton(
+            onPressed: () {
+              context.read<ChatBloc>().add(
+                    ChatTextSent(_controller.text),
+                  );
+              _controller.clear();
+            },
+            icon: const Icon(Icons.send),
           ),
         ),
       );
