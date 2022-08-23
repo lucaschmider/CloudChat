@@ -3,4 +3,5 @@ enum AuthentificationResult {
   unkownUser,
   invalidPassword,
   unknownError,
+  canceled,
 }

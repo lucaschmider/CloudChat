@@ -8,10 +8,14 @@ import 'package:cloud_chat/chat/bloc/models/initial_chat_room_state.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../utils/date_time_extensions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseRepository implements ChatRepository, AuthenticationRepository {
   final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+  final _googleSignIn = GoogleSignIn();
 
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
@@ -22,9 +26,8 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
   }
 
   @override
-  Stream<void> createSignOutStream() {
-    return const Stream.empty();
-  }
+  Stream<void> createSignOutStream() =>
+      _auth.userChanges().where((event) => event == null);
 
   @override
   Future<InitialChatRoomState> getChatRoom(String chatRoomId) async {
@@ -81,8 +84,11 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
   }
 
   @override
-  Stream<UserChangedEvent> getUserStream() =>
-      Stream.value("EmfC8HLMScfXu0pau5qCvTCJFc73").asyncMap((event) async {
+  Stream<UserChangedEvent> getUserStream() => _auth
+          .authStateChanges()
+          .where((event) => event != null)
+          .map((event) => event!.uid)
+          .asyncMap((event) async {
         final results = await Future.wait([
           _firestore.doc("users/$event").get(),
           _firestore
@@ -120,25 +126,55 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
       });
 
   @override
-  Future<AuthentificationResult> signInWithGoogleAsync() {
-    return Future.value(AuthentificationResult.success);
+  Future<AuthentificationResult> signInWithGoogleAsync() async {
+    try {
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return AuthentificationResult.canceled;
+
+      final googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await _auth.signInWithCredential(credential);
+      return AuthentificationResult.success;
+    } on FirebaseAuthException catch (e) {
+      return getAuthenticationResult(e.code);
+    }
   }
 
   @override
   Future<AuthentificationResult> signInWithUsernameAndPasswordAsync(
-      String username, String password) {
-    return Future.value(AuthentificationResult.success);
+      String username, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+          email: username, password: password);
+      return AuthentificationResult.success;
+    } on FirebaseAuthException catch (e) {
+      return getAuthenticationResult(e.code);
+    }
   }
 
   @override
-  Future<void> signOut() {
-    return Future.value();
+  Future<void> signOut() async {
+    await _auth.signOut();
   }
 
   @override
   Future<AuthentificationResult> signUpWithUsernameAndPassword(
-      String username, String email, String fullName) {
-    return Future.value(AuthentificationResult.success);
+      String username, String password, String fullName) async {
+    try {
+      final credentials = await _auth.createUserWithEmailAndPassword(
+          email: username, password: password);
+      await _firestore.doc("users/${credentials.user!.uid}").set({
+        "name": fullName,
+      });
+      return Future.value(AuthentificationResult.success);
+    } on FirebaseAuthException catch (e) {
+      return getAuthenticationResult(e.code);
+    }
   }
 
   @override
@@ -152,4 +188,17 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
           metadata: await getChatRoomMetadata(chatRoomId, data),
         );
       });
+
+  AuthentificationResult getAuthenticationResult(String code) {
+    switch (code) {
+      case "user-not-found":
+        return AuthentificationResult.unkownUser;
+      case "invalid-email":
+        return AuthentificationResult.unkownUser;
+      case "wrong-password":
+        return AuthentificationResult.invalidPassword;
+      default:
+        return AuthentificationResult.unknownError;
+    }
+  }
 }
