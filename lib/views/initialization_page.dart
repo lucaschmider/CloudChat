@@ -3,8 +3,6 @@ import 'package:cloud_chat/utils/clamp.dart';
 import 'package:cloud_chat/views/backend_selector.dart';
 import 'package:cloud_chat/views/login_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InitializationPage extends StatefulWidget {

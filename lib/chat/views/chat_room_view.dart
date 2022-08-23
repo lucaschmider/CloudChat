@@ -1,8 +1,6 @@
 import 'package:cloud_chat/chat/views/chat_message_input.dart';
 import 'package:cloud_chat/chat/views/chat_message_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/chat_bloc.dart';

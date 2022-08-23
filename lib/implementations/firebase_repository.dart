@@ -8,7 +8,6 @@ import 'package:cloud_chat/chat/bloc/models/initial_chat_room_state.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../utils/date_time_extensions.dart';
 
 class FirebaseRepository implements ChatRepository, AuthenticationRepository {
@@ -47,11 +46,13 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
     );
   }
 
-  ChatMessage parseChatMessage(e) => ChatMessage(
-        text: e["text"],
-        userId: e["userId"],
-        timestamp: Mappers.parseDate(e["timestamp"]),
-      );
+  ChatMessage parseChatMessage(e) {
+    return ChatMessage(
+      text: e["text"],
+      userId: e["userId"],
+      timestamp: Mappers.parseDate(e["timestamp"]),
+    );
+  }
 
   Future<ChatRoomMetadata> getChatRoomMetadata(
       String chatRoomId, dynamic data) async {
@@ -78,18 +79,6 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
       participants: participants,
     );
   }
-
-  @override
-  Stream<ChatMessage> getMessageStream(String chatRoomId) => _firestore
-      .doc("rooms/$chatRoomId")
-      .snapshots()
-      .map((event) => parseChatMessage(event.data()));
-
-  @override
-  Stream<ChatRoomMetadata> getMetadataStream(String chatRoomId) => _firestore
-      .doc("rooms/$chatRoomId")
-      .snapshots()
-      .asyncMap((event) => getChatRoomMetadata(chatRoomId, event.data()));
 
   @override
   Stream<UserChangedEvent> getUserStream() =>
@@ -151,4 +140,16 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
       String username, String email, String fullName) {
     return Future.value(AuthentificationResult.success);
   }
+
+  @override
+  Stream<InitialChatRoomState> getChatRoomStream(String chatRoomId) =>
+      _firestore.doc("rooms/$chatRoomId").snapshots().asyncMap((event) async {
+        final data = event.data()!;
+        return InitialChatRoomState(
+          messages: (data["messages"] as List<dynamic>)
+              .map(parseChatMessage)
+              .toList(),
+          metadata: await getChatRoomMetadata(chatRoomId, data),
+        );
+      });
 }

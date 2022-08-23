@@ -17,8 +17,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final Logger logger;
   final ChatRepository repository;
 
-  StreamSubscription? messageSubscription;
-  StreamSubscription? metadataSubscription;
+  StreamSubscription? roomSubscription;
   late final StreamSubscription userSubscription;
 
   ChatBloc({
@@ -38,7 +37,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
     on<ChatRoomRetrieved>(_handleChatRoomRetrieved);
     on<ChatRoomSelected>(_handleChatRoomSelected);
-    on<ChatMessageAdded>(_handleChatMessageAdded);
     on<ChatRoomChanged>(
       (event, emit) => emit(ChatRoomAvailable(
         sender: state.sender!,
@@ -73,36 +71,23 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   void _handleChatRoomRetrieved(
       ChatRoomRetrieved event, Emitter<ChatState> emit) {
-    if (state is! ChatUserAvailable) {
+    if (state is! ChatUserAvailable && state is! ChatRoomAvailable) {
       logger.warn(
-          "State transition 'ChatRoomRetrieved' is only valid from state 'ChatUserAvailable'");
+          "State transition 'ChatRoomRetrieved' is only valid from state 'ChatUserAvailable' or 'ChatRoomAvailable'");
       return;
     }
-    messageSubscription = repository
-        .getMessageStream(event.chatRoom.chatRoomId)
-        .listen((event) => add(ChatMessageAdded(event)));
-    metadataSubscription = repository
-        .getMetadataStream(event.chatRoom.chatRoomId)
-        .listen((event) => add(ChatRoomChanged(event)));
+
+    roomSubscription ??= repository
+        .getChatRoomStream(event.chatRoom.chatRoomId)
+        .listen((event) => add(ChatRoomRetrieved(
+              chatRoom: event.metadata,
+              messages: event.messages,
+            )));
+
     emit(ChatRoomAvailable(
       sender: state.sender!,
       chatRoom: event.chatRoom,
       messages: event.messages,
-      chatRoomOptions: state.chatRoomOptions,
-    ));
-  }
-
-  void _handleChatMessageAdded(event, emit) {
-    if (state is! ChatRoomAvailable) {
-      logger.warn(
-          "State transition 'ChatMessageAdded' is only valid from state 'ChatRoomAvailable'");
-      return;
-    }
-
-    emit(ChatRoomAvailable(
-      sender: state.sender!,
-      chatRoom: state.chatRoom!,
-      messages: [...state.messages, event.message],
       chatRoomOptions: state.chatRoomOptions,
     ));
   }
@@ -117,8 +102,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       return;
     }
 
-    messageSubscription?.cancel();
-    metadataSubscription?.cancel();
+    roomSubscription?.cancel();
 
     emit(ChatUserAvailable(
       sender: state.sender!,
@@ -140,7 +124,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   @override
   Future<void> close() {
     userSubscription.cancel();
-    messageSubscription?.cancel();
+    roomSubscription?.cancel();
 
     return super.close();
   }

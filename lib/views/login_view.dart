@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 import 'custom_text_input.dart';
 
@@ -54,8 +52,8 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         "Login",
                         style: TextStyle(fontSize: 18.0),

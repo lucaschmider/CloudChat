@@ -1,7 +1,5 @@
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class ChatMessageView extends StatelessWidget {
   final ChatMessage message;

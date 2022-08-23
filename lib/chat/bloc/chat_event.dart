@@ -28,11 +28,6 @@ class ChatRoomSelected extends ChatEvent {
   const ChatRoomSelected(this.chatRoomId);
 }
 
-class ChatMessageAdded extends ChatEvent {
-  final ChatMessage message;
-  const ChatMessageAdded(this.message);
-}
-
 class ChatRoomChanged extends ChatEvent {
   final ChatRoomMetadata chatRoom;
   const ChatRoomChanged(this.chatRoom);
