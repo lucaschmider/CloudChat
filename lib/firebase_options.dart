@@ -26,7 +26,10 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -57,16 +60,5 @@ class DefaultFirebaseOptions {
     authDomain: 'cloud-chat-fd207.firebaseapp.com',
     databaseURL: 'https://cloud-chat-fd207-default-rtdb.firebaseio.com',
     storageBucket: 'cloud-chat-fd207.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyATxuAeFLBkgY-cAWzGFb5lUxIIcjW4Zvw',
-    appId: '1:556196467528:ios:54ea6c8de1d844ef32d97d',
-    messagingSenderId: '556196467528',
-    projectId: 'cloud-chat-fd207',
-    databaseURL: 'https://cloud-chat-fd207-default-rtdb.firebaseio.com',
-    storageBucket: 'cloud-chat-fd207.appspot.com',
-    iosClientId: '556196467528-naraltgr1bgldemr7mgohai254qa301n.apps.googleusercontent.com',
-    iosBundleId: 'com.example.cloudChat',
   );
 }
