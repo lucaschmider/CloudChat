@@ -10,4 +10,9 @@ class ChatUser {
     required this.userId,
     required this.name,
   });
+
+  static ChatUser fromDynamic(dynamic data) => ChatUser(
+        userId: data["userId"],
+        name: data["name"],
+      );
 }
