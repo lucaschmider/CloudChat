@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class CustomTextInput extends StatelessWidget {
   final String hintText;
   final Widget? suffixIcon;
+  final TextAlign? textAlign;
 
   const CustomTextInput({
     Key? key,
     required TextEditingController controller,
     required this.hintText,
     this.suffixIcon,
+    this.textAlign,
   })  : _controller = controller,
         super(key: key);
 
@@ -17,6 +19,7 @@ class CustomTextInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      textAlign: textAlign ?? TextAlign.start,
       controller: _controller,
       decoration: InputDecoration(
         hintText: hintText,

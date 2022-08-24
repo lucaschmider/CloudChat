@@ -5,13 +5,13 @@ abstract class AuthenticationRepository {
     String username,
     String password,
   );
-  Future<AuthentificationResult> signInWithGoogleAsync();
   Future<AuthentificationResult> signUpWithUsernameAndPassword(
     String username,
     String email,
-    String fullName,
   );
   Future<void> signOut();
 
   Stream<void> createSignOutStream();
+  Future<bool> isCurrentProfileCompleted();
+  Future<void> setFullName(String fullName);
 }

@@ -8,6 +8,12 @@ class BackendConnectorRegistry implements BackendConnectorRepository {
   List<BackendConnector> getAvailableConnectors() {
     return [
       BackendConnector(
+        name: "Mocked",
+        assetName: "anchor.svg",
+        chatRepositoryFactory: () => FirebaseRepository(),
+        authenticationRepository: () => FirebaseRepository(),
+      ),
+      BackendConnector(
         name: "Firebase",
         assetName: "layers.svg",
         chatRepositoryFactory: () => FirebaseRepository(),

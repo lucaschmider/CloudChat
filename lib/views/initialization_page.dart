@@ -1,7 +1,8 @@
 import 'package:cloud_chat/bloc/cloud_chat_bloc.dart';
 import 'package:cloud_chat/utils/clamp.dart';
-import 'package:cloud_chat/views/backend_selector.dart';
-import 'package:cloud_chat/views/login_view.dart';
+import 'package:cloud_chat/views/complete_profile_step.dart';
+import 'package:cloud_chat/views/login_step.dart';
+import 'package:cloud_chat/views/select_backend_step.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,6 +14,16 @@ class InitializationPage extends StatefulWidget {
 }
 
 class _InitializationPageState extends State<InitializationPage> {
+  int getInitializationLevel(CloudChatState state) {
+    if (state is CloudChatInitial) return 0;
+    if (state is CloudChatConnectorsKnown) return 1;
+    if (state is CloudChatConnected) return 2;
+    if (state is CloudChatProfileCompletion) return 3;
+    if (state is CloudChatSignedIn) return 4;
+
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     final boxWidth = clamp(
@@ -40,42 +51,46 @@ class _InitializationPageState extends State<InitializationPage> {
             height: boxHeight,
             child: BlocBuilder<CloudChatBloc, CloudChatState>(
               builder: (context, state) {
-                if (state is CloudChatInitial) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+                final initializationLevel = getInitializationLevel(state);
 
-                return Stack(
-                  children: [
-                    AnimatedPositioned(
-                      width: boxWidth,
-                      left: (state is! CloudChatConnected) ? boxWidth : 0,
-                      duration: const Duration(milliseconds: 150),
-                      curve: Curves.easeInCubic,
-                      child: LoginView(
-                        height: boxHeight,
-                        onLogin: (username, password) => context
-                            .read<CloudChatBloc>()
-                            .add(CloudChatPasswordLoginRequested(
-                                username, password)),
-                      ),
-                    ),
-                    AnimatedPositioned(
-                      width: boxWidth,
-                      left: (state is CloudChatConnected) ? -boxWidth : 0,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInCubic,
-                      child: BackendSelector(
-                        height: boxHeight,
-                        connectors: state.availableConnectors,
-                        onBackendSelected: (selectedBackend) => context
-                            .read<CloudChatBloc>()
-                            .add(
-                                CloudChatBackendSelected(selectedBackend.name)),
-                      ),
-                    ),
-                  ],
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (initializationLevel == 0)
+                        const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      if (initializationLevel >= 1)
+                        SelectBackendStep(
+                          connectors: state.availableConnectors,
+                          onBackendSelected: (selection) => context
+                              .read<CloudChatBloc>()
+                              .add(CloudChatBackendSelected(selection.name)),
+                        ),
+                      if (initializationLevel >= 2)
+                        LoginStep(
+                          onPasswordLogin: (userName, password) => context
+                              .read<CloudChatBloc>()
+                              .add(CloudChatPasswordLoginRequested(
+                                  userName, password)),
+                          onCreateUser: (username, password) => context
+                              .read<CloudChatBloc>()
+                              .add(CloudChatUserCreated(username, password)),
+                          isLoggedIn: initializationLevel > 2,
+                        ),
+                      if (initializationLevel >= 3)
+                        CompleteProfileStep(
+                          onCompleted: (fullName) =>
+                              context.read<CloudChatBloc>().add(
+                                    CloudChatProfileCompleted(
+                                      fullName: fullName,
+                                    ),
+                                  ),
+                        ),
+                    ],
+                  ),
                 );
               },
             ),

@@ -8,14 +8,13 @@ import 'package:cloud_chat/chat/bloc/models/initial_chat_room_state.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 import '../utils/date_time_extensions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseRepository implements ChatRepository, AuthenticationRepository {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
-  final _googleSignIn = GoogleSignIn();
 
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
@@ -126,26 +125,6 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
       });
 
   @override
-  Future<AuthentificationResult> signInWithGoogleAsync() async {
-    try {
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return AuthentificationResult.canceled;
-
-      final googleAuth = await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await _auth.signInWithCredential(credential);
-      return AuthentificationResult.success;
-    } on FirebaseAuthException catch (e) {
-      return getAuthenticationResult(e.code);
-    }
-  }
-
-  @override
   Future<AuthentificationResult> signInWithUsernameAndPasswordAsync(
       String username, String password) async {
     try {
@@ -164,13 +143,15 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
 
   @override
   Future<AuthentificationResult> signUpWithUsernameAndPassword(
-      String username, String password, String fullName) async {
+    String username,
+    String password,
+  ) async {
     try {
-      final credentials = await _auth.createUserWithEmailAndPassword(
-          email: username, password: password);
-      await _firestore.doc("users/${credentials.user!.uid}").set({
-        "name": fullName,
-      });
+      await _auth.createUserWithEmailAndPassword(
+        email: username,
+        password: password,
+      );
+
       return Future.value(AuthentificationResult.success);
     } on FirebaseAuthException catch (e) {
       return getAuthenticationResult(e.code);
@@ -200,5 +181,23 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
       default:
         return AuthentificationResult.unknownError;
     }
+  }
+
+  @override
+  Future<bool> isCurrentProfileCompleted() async {
+    final currentUserId = _auth.currentUser?.uid;
+
+    if (currentUserId == null) return false;
+
+    final doc = await _firestore.doc("users/$currentUserId").get();
+    return doc.exists;
+  }
+
+  @override
+  Future<void> setFullName(String fullName) {
+    final currentUserId = _auth.currentUser!.uid;
+    return _firestore.doc("users/$currentUserId").set({
+      "name": fullName,
+    });
   }
 }

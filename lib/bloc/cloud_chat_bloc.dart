@@ -24,10 +24,74 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     on<CloudChatBackendConnectorsRetrieved>(_handleConnectorsRetrieved);
     on<CloudChatBackendSelected>(_handleBackendSelection);
     on<CloudChatPasswordLoginRequested>(_handlePasswordLogin);
-    on<CloudChatGoogleLoginRequested>(_handleGoogleLogin);
     on<CloudChatSignOutRequested>(_handleSignOut);
+    on<CloudChatProfileCompleted>(_handleProfileCompletion);
+    on<CloudChatUserCreated>(_handleUserCreation);
 
     initialize();
+  }
+
+  void _handleUserCreation(
+    CloudChatUserCreated event,
+    Emitter<CloudChatState> emit,
+  ) async {
+    if (authentificationRepository == null) {
+      logger.warn(
+          "State transition 'CloudChatUserCreated' is only valid while a backend is selected.");
+      return;
+    }
+
+    emit(CloudChatConnected(
+      availableConnectors: state.availableConnectors,
+      connector: state.connector,
+      isLoading: true,
+    ));
+
+    await authentificationRepository!
+        .signUpWithUsernameAndPassword(event.username, event.password);
+
+    final isProfileCompleted =
+        await authentificationRepository!.isCurrentProfileCompleted();
+
+    if (isProfileCompleted) {
+      emit(CloudChatSignedIn(
+        availableConnectors: state.availableConnectors,
+        connector: state.connector,
+        isLoading: false,
+      ));
+      return;
+    }
+
+    emit(CloudChatProfileCompletion(
+      availableConnectors: state.availableConnectors,
+      connector: state.connector,
+      isLoading: false,
+    ));
+  }
+
+  void _handleProfileCompletion(
+    CloudChatProfileCompleted event,
+    Emitter<CloudChatState> emit,
+  ) async {
+    if (state is! CloudChatProfileCompletion) {
+      logger.warn(
+          "State transition 'CloudChatProfileCompleted' is only valid from state 'CloudChatProfileCompletion.'");
+      return;
+    }
+
+    emit(CloudChatProfileCompletion(
+      availableConnectors: state.availableConnectors,
+      connector: state.connector,
+      isLoading: true,
+    ));
+
+    await authentificationRepository!.setFullName(event.fullName);
+
+    emit(CloudChatSignedIn(
+      availableConnectors: state.availableConnectors,
+      connector: state.connector,
+      isLoading: false,
+    ));
   }
 
   void _handleSignOut(event, emit) async {
@@ -52,28 +116,6 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     ));
   }
 
-  void _handleGoogleLogin(event, emit) async {
-    if (authentificationRepository == null) {
-      logger.warn(
-          "State transition 'CloudChatGoogleLoginRequested' is only valid while a backend is selected.");
-      return;
-    }
-
-    emit(CloudChatConnected(
-      availableConnectors: state.availableConnectors,
-      connector: state.connector,
-      isLoading: true,
-    ));
-
-    await authentificationRepository!.signInWithGoogleAsync();
-
-    emit(CloudChatSignedIn(
-      availableConnectors: state.availableConnectors,
-      connector: state.connector,
-      isLoading: false,
-    ));
-  }
-
   void _handlePasswordLogin(event, emit) async {
     if (authentificationRepository == null) {
       logger.warn(
@@ -90,7 +132,19 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     await authentificationRepository!
         .signInWithUsernameAndPasswordAsync(event.username, event.password);
 
-    emit(CloudChatSignedIn(
+    final isProfileCompleted =
+        await authentificationRepository!.isCurrentProfileCompleted();
+
+    if (isProfileCompleted) {
+      emit(CloudChatSignedIn(
+        availableConnectors: state.availableConnectors,
+        connector: state.connector,
+        isLoading: false,
+      ));
+      return;
+    }
+
+    emit(CloudChatProfileCompletion(
       availableConnectors: state.availableConnectors,
       connector: state.connector,
       isLoading: false,
@@ -126,8 +180,9 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
           "State transition 'CloudChatBackendConnectorsRetrieved' is only valid from state 'CloudChatInitial'");
       return;
     }
-    emit(CloudChatConnectorsKnown(
-        availableConnectors: event.availableConnectors));
+    emit(
+      CloudChatConnectorsKnown(availableConnectors: event.availableConnectors),
+    );
   }
 
   void initialize() {

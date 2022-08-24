@@ -42,3 +42,11 @@ class CloudChatSignedIn extends CloudChatState {
     required super.isLoading,
   });
 }
+
+class CloudChatProfileCompletion extends CloudChatState {
+  const CloudChatProfileCompletion({
+    required super.availableConnectors,
+    required super.connector,
+    required super.isLoading,
+  });
+}

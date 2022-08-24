@@ -28,7 +28,23 @@ class CloudChatPasswordLoginRequested extends CloudChatEvent {
 }
 
 @immutable
-class CloudChatGoogleLoginRequested extends CloudChatEvent {}
+class CloudChatUserCreated extends CloudChatEvent {
+  final String username;
+  final String password;
+  const CloudChatUserCreated(
+    this.username,
+    this.password,
+  );
+}
+
+@immutable
+class CloudChatProfileCompleted extends CloudChatEvent {
+  final String fullName;
+
+  const CloudChatProfileCompleted({
+    required this.fullName,
+  });
+}
 
 @immutable
 class CloudChatSignOutRequested extends CloudChatEvent {}
