@@ -83,31 +83,15 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
   }
 
   @override
-  Stream<UserChangedEvent> getUserStream() => _auth
-          .authStateChanges()
-          .where((event) => event != null)
-          .map((event) => event!.uid)
+  Stream<UserChangedEvent> getUserStream() => _firestore
+          .collection("rooms")
+          .where("participants", arrayContains: _auth.currentUser!.uid)
+          .snapshots()
           .asyncMap((event) async {
-        final results = await Future.wait([
-          _firestore.doc("users/$event").get(),
-          _firestore
-              .collection("rooms")
-              .where("participants", arrayContains: event)
-              .get(),
-        ]);
+        final profile =
+            await _firestore.doc("users/${_auth.currentUser!.uid}").get();
 
-        final currentUserSnapshot =
-            results[0] as DocumentSnapshot<Map<String, dynamic>>;
-        final chatRooms = results[1] as QuerySnapshot<Map<String, dynamic>>;
-
-        var currentUserData = currentUserSnapshot.data()!;
-
-        final chatUser = ChatUser(
-          userId: currentUserSnapshot.id,
-          name: currentUserData["name"],
-        );
-
-        final chatRoomOptions = chatRooms.docs.map(
+        final chatRoomOptions = event.docs.map(
           (e) {
             final data = e.data();
             return ChatRoomOption(
@@ -119,7 +103,10 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
         ).toList();
 
         return UserChangedEvent(
-          chatUser,
+          ChatUser(
+            name: profile.data()!["name"],
+            userId: profile.id,
+          ),
           chatRoomOptions,
         );
       });
@@ -199,5 +186,32 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
     return _firestore.doc("users/$currentUserId").set({
       "name": fullName,
     });
+  }
+
+  @override
+  Future<void> updateChatRoom(ChatRoomMetadata metadata) {
+    return _firestore.doc("rooms/${metadata.chatRoomId}").set(
+      {
+        "name": metadata.name,
+        "participants": [
+          ...metadata.participants.map((e) => e.userId),
+          _auth.currentUser!.uid
+        ],
+        "messages": [],
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  @override
+  Future<List<ChatUser>> getAllUsers() async {
+    final userDocs = await _firestore.collection("users").get();
+    return userDocs.docs
+        .where((element) => element.id != _auth.currentUser?.uid)
+        .map((e) => ChatUser(
+              userId: e.id,
+              name: e.data()["name"],
+            ))
+        .toList();
   }
 }

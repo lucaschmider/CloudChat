@@ -9,7 +9,10 @@ abstract class ChatEvent {
 class ChatLogin extends ChatEvent {
   final ChatUser user;
   final List<ChatRoomOption> chatRoomOptions;
-  const ChatLogin(this.user, this.chatRoomOptions);
+  const ChatLogin({
+    required this.user,
+    required this.chatRoomOptions,
+  });
 }
 
 class ChatLogout extends ChatEvent {}
@@ -36,4 +39,21 @@ class ChatRoomChanged extends ChatEvent {
 class ChatTextSent extends ChatEvent {
   final String message;
   const ChatTextSent(this.message);
+}
+
+class ChatEditRequested extends ChatEvent {
+  final ChatRoomMetadata? metadata;
+
+  const ChatEditRequested(this.metadata);
+}
+
+class ChatEditCompleted extends ChatEvent {
+  final ChatRoomMetadata? metadata;
+
+  const ChatEditCompleted(this.metadata);
+}
+
+class ChatAllUsersRetrieved extends ChatEvent {
+  final List<ChatUser> allUsers;
+  const ChatAllUsersRetrieved(this.allUsers);
 }

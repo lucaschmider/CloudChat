@@ -172,6 +172,9 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
       connector: connector,
       isLoading: false,
     ));
+
+    add(CloudChatPasswordLoginRequested(
+        "max.mustermann@gmail.com", "12345678"));
   }
 
   void _handleConnectorsRetrieved(event, emit) {

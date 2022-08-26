@@ -42,14 +42,22 @@ class ChatUserAvailable extends ChatState {
 @immutable
 class ChatRoomAvailable extends ChatState {
   const ChatRoomAvailable({
-    required ChatUser sender,
-    required ChatRoomMetadata chatRoom,
-    required List<ChatMessage> messages,
-    required List<ChatRoomOption> chatRoomOptions,
-  }) : super(
-          chatRoom: chatRoom,
-          sender: sender,
-          messages: messages,
-          chatRoomOptions: chatRoomOptions,
-        );
+    required super.sender,
+    required super.chatRoom,
+    required super.messages,
+    required super.chatRoomOptions,
+  });
+}
+
+@immutable
+class ChatRoomEditMode extends ChatState {
+  final List<ChatUser> allUsers;
+
+  const ChatRoomEditMode({
+    required super.sender,
+    required super.chatRoom,
+    required super.messages,
+    required super.chatRoomOptions,
+    required this.allUsers,
+  });
 }

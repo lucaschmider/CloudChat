@@ -1,4 +1,5 @@
 import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
+import 'package:cloud_chat/views/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,40 +19,44 @@ class ChatRoomSelector extends StatelessWidget {
             ),
           ],
         ),
-        child: BlocSelector<ChatBloc, ChatState, List<ChatRoomOption>>(
-          selector: (state) => state.chatRoomOptions,
-          builder: (context, state) => ListView.builder(
-            itemBuilder: (context, index) {
-              final chatRoom = state.elementAt(index);
-              return Material(
-                color: chatRoom.isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.secondary,
-                child: InkWell(
-                  onTap: () => context
-                      .read<ChatBloc>()
-                      .add(ChatRoomSelected(chatRoom.chatRoomId)),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16.0,
-                      horizontal: 20.0,
-                    ),
-                    child: Text(
-                      chatRoom.name,
-                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                            color: chatRoom.isSelected
-                                ? Theme.of(context).colorScheme.onPrimary
-                                : Theme.of(context).colorScheme.onSecondary,
-                            fontWeight: chatRoom.isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                    ),
-                  ),
+        child: Material(
+          child: Column(
+            children: [
+              BlocSelector<ChatBloc, ChatState, List<ChatRoomOption>>(
+                selector: (state) => state.chatRoomOptions,
+                builder: (context, state) => ListView.builder(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    final chatRoom = state.elementAt(index);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4.0,
+                        horizontal: 16.0,
+                      ),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        tileColor: chatRoom.isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.background,
+                        title: Text(chatRoom.name),
+                        onTap: () => context
+                            .read<ChatBloc>()
+                            .add(ChatRoomSelected(chatRoom.chatRoomId)),
+                      ),
+                    );
+                  },
+                  itemCount: state.length,
                 ),
-              );
-            },
-            itemCount: state.length,
+              ),
+              CustomButton(
+                  isPrimary: false,
+                  text: "Raum erstellen",
+                  onClick: () => context
+                      .read<ChatBloc>()
+                      .add(const ChatEditRequested(null))),
+            ],
           ),
         ),
       );
