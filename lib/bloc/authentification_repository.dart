@@ -7,7 +7,7 @@ abstract class AuthenticationRepository {
   );
   Future<AuthentificationResult> signUpWithUsernameAndPassword(
     String username,
-    String email,
+    String password,
   );
   Future<void> signOut();
 

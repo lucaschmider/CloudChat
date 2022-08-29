@@ -19,6 +19,7 @@ dependencies:
   cloud_firestore: ^3.4.5
   firebase_auth: ^3.6.4
   uuid: ^3.0.6
+  backendless_sdk: ^7.2.3
 
 dev_dependencies:
   flutter_test:
