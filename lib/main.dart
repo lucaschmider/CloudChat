@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  Bloc.observer = ConsoleBlocObserver();
+  Bloc.observer = ConsoleLoggingBlocObserver();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

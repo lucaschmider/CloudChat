@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
 import 'package:cloud_chat/chat/bloc/models/user_changed_event.dart';
@@ -13,13 +12,11 @@ import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 
 import 'package:cloud_chat/bloc/models/authentification_result.dart';
-import 'package:cloud_chat/implementations/backendless/combine_where_clause.dart';
 import 'package:cloud_chat/implementations/backendless/models/room_message.dart';
 import 'package:cloud_chat/implementations/backendless/models/room_participant.dart';
 import 'package:cloud_chat/implementations/backendless/models/quadruple.dart';
 import 'package:cloud_chat/implementations/backendless/models/user.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:rxdart/subjects.dart';
 
 import '../../bloc/authentification_repository.dart';
 import '../../chat/bloc/chat_repository.dart';
@@ -49,7 +46,7 @@ class BackendlessRepository
   }
 
   void _initializeStores() {
-    userStore = Backendless.data.of("users");
+    userStore = Backendless.data.of("user");
     roomMessageStore = Backendless.data.of("room_messages");
     roomParticipantStore = Backendless.data.of("room_participants");
     roomStore = Backendless.data.of("rooms");

@@ -151,7 +151,8 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     ));
   }
 
-  void _handleBackendSelection(event, emit) {
+  void _handleBackendSelection(
+      CloudChatBackendSelected event, Emitter<CloudChatState> emit) {
     if (state.availableConnectors.isEmpty) {
       logger.warn(
           "State transition 'CloudChatBackendSelected' is only valid while connectors are known.");
@@ -159,8 +160,8 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     }
 
     signOutSubscription?.cancel();
-    final connector = state.availableConnectors
-        .singleWhere((con) => con.name == event.userId);
+    final connector =
+        state.availableConnectors.singleWhere((con) => con.name == event.name);
     authentificationRepository = connector.authenticationRepository();
 
     signOutSubscription = authentificationRepository!
@@ -172,9 +173,6 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
       connector: connector,
       isLoading: false,
     ));
-
-    add(CloudChatPasswordLoginRequested(
-        "max.mustermann@gmail.com", "12345678"));
   }
 
   void _handleConnectorsRetrieved(event, emit) {
