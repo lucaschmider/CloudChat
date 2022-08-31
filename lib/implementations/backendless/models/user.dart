@@ -13,6 +13,9 @@ class User {
     );
   }
 
+  static List<User> fromMaps(List<Map<String, dynamic>> inputs) =>
+      inputs.map((e) => fromMap(e)).toList();
+
   Map<String, dynamic> toMap() {
     return {
       "userId": userId,

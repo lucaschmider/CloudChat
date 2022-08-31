@@ -1,5 +1,6 @@
 import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_user.dart';
+import 'package:cloud_chat/implementations/backendless/models/user.dart';
 
 class RoomParticipant {
   final String roomId;
@@ -14,10 +15,9 @@ class RoomParticipant {
     );
   }
 
-  static List<RoomParticipant> fromDomain(ChatRoomMetadata metadata) {
-    return metadata.participants
-        .map((e) => RoomParticipant._(metadata.chatRoomId, e.userId))
-        .toList();
+  static List<RoomParticipant> fromDomain(
+      List<ChatUser> users, String chatRoomId) {
+    return users.map((e) => RoomParticipant._(chatRoomId, e.userId)).toList();
   }
 
   static List<RoomParticipant> fromMaps(List<Map<String, dynamic>> inputs) =>
@@ -30,8 +30,12 @@ class RoomParticipant {
     };
   }
 
-  ChatUser toDomain(List<ChatUser> allUsers) {
-    return allUsers.singleWhere((element) => element.userId == userId);
+  ChatUser toDomain(List<User> allUsers) {
+    final user = allUsers.singleWhere((element) => element.userId == userId);
+    return ChatUser(
+      userId: user.userId,
+      name: user.name,
+    );
   }
 
   String getWhereClause() {
