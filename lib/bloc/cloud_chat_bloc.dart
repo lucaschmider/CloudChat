@@ -159,8 +159,8 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     }
 
     signOutSubscription?.cancel();
-    final connector =
-        state.availableConnectors.singleWhere((con) => con.name == event.name);
+    final connector = state.availableConnectors
+        .singleWhere((con) => con.name == event.userId);
     authentificationRepository = connector.authenticationRepository();
 
     signOutSubscription = authentificationRepository!

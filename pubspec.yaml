@@ -20,6 +20,7 @@ dependencies:
   firebase_auth: ^3.6.4
   uuid: ^3.0.6
   backendless_sdk: ^7.2.3
+  rxdart: ^0.27.5
 
 dev_dependencies:
   flutter_test:

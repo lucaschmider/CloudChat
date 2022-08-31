@@ -1,5 +1,5 @@
 import 'package:cloud_chat/bloc/backend_connector_repository.dart';
-import 'package:cloud_chat/implementations/backendless_repository.dart';
+import 'package:cloud_chat/implementations/backendless/backendless_repository.dart';
 
 import '../bloc/models/backend_connector.dart';
 import 'firebase_repository.dart';
