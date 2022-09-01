@@ -7,7 +7,7 @@ class RoomMessage {
   final String messageId;
   final String sender;
   final String text;
-  final DateTime timestamp;
+  final String timestamp;
 
   RoomMessage._({
     required this.roomId,
@@ -39,7 +39,7 @@ class RoomMessage {
       messageId: _uuid.v4(),
       sender: message.userId,
       text: message.text,
-      timestamp: message.timestamp,
+      timestamp: message.timestamp.toIso8601String(),
     );
   }
 
@@ -54,6 +54,10 @@ class RoomMessage {
   }
 
   ChatMessage toDomain() {
-    return ChatMessage(text: text, userId: sender, timestamp: timestamp);
+    return ChatMessage(
+      text: text,
+      userId: sender,
+      timestamp: DateTime.parse(timestamp),
+    );
   }
 }

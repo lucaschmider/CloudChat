@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
@@ -9,6 +10,7 @@ import '../../logger.dart';
 import 'models/chat_message.dart';
 import 'models/chat_room_metadata.dart';
 import 'models/chat_user.dart';
+import 'models/user_changed_event.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';
@@ -33,18 +35,54 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ChatEditRequested>(_handleChatEditRequest);
     on<ChatEditCompleted>(_handleChatRoomEditCompleted);
     on<ChatAllUsersRetrieved>(_handleAllUsersRetrieved);
-    userSubscription = repository.getUserStream().listen(_handleUserChange);
+    on<ChatUserChanged>(_handleChatUserChanged);
+    userSubscription =
+        repository.getUserStream().listen((event) => add(ChatUserChanged(
+              chatRoomOptions: event.chatRoomOptions,
+              user: event.user,
+            )));
   }
 
-  void _handleUserChange(event) {
+  void _handleChatUserChanged(ChatUserChanged event, Emitter<ChatState> emit) {
     if (event.user == null) {
       add(ChatLogout());
       return;
     }
-    add(ChatLogin(
-      user: event.user!,
-      chatRoomOptions: event.chatRoomOptions!,
-    ));
+    if (state is ChatInitial) {
+      add(ChatLogin(
+        user: event.user!,
+        chatRoomOptions: event.chatRoomOptions!,
+      ));
+      return;
+    }
+
+    if (state is ChatRoomAvailable) {
+      emit(ChatRoomAvailable(
+        sender: event.user!,
+        chatRoom: state.chatRoom,
+        messages: state.messages,
+        chatRoomOptions: event.chatRoomOptions!,
+      ));
+      return;
+    }
+
+    if (state is ChatUserAvailable) {
+      emit(ChatUserAvailable(
+        sender: event.user!,
+        chatRoomOptions: event.chatRoomOptions!,
+      ));
+      return;
+    }
+
+    if (state is ChatRoomEditMode) {
+      emit(ChatRoomEditMode(
+        sender: event.user!,
+        chatRoom: state.chatRoom,
+        messages: state.messages,
+        chatRoomOptions: event.chatRoomOptions!,
+        allUsers: (state as ChatRoomEditMode).allUsers,
+      ));
+    }
   }
 
   void _handleAllUsersRetrieved(event, emit) {

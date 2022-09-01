@@ -15,6 +15,16 @@ class ChatLogin extends ChatEvent {
   });
 }
 
+class ChatUserChanged extends ChatEvent {
+  final ChatUser? user;
+  final List<ChatRoomOption>? chatRoomOptions;
+
+  const ChatUserChanged({
+    required this.user,
+    required this.chatRoomOptions,
+  });
+}
+
 class ChatLogout extends ChatEvent {}
 
 class ChatRoomRetrieved extends ChatEvent {

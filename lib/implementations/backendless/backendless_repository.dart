@@ -55,7 +55,7 @@ class BackendlessRepository
     final row = RoomMessage.fromDomain(message, chatRoomId);
 
     await _httpClient.post(
-      BackendlessPaths.loginPath,
+      BackendlessPaths.roomMessagesPath,
       data: row.toMap(),
     );
   }
@@ -175,10 +175,7 @@ class BackendlessRepository
 
   @override
   Future<void> updateChatRoom(ChatRoomMetadata metadata) => Future.wait([
-        _httpClient.put(
-          "${BackendlessPaths.bulkRoomPath}?where=roomId%20%3D%20%27${metadata.chatRoomId}%27",
-          data: {"name": metadata.name},
-        ),
+        _setChatRoomName(metadata),
         _updateParticipants(metadata.chatRoomId, metadata.participants),
       ]);
 
@@ -187,11 +184,23 @@ class BackendlessRepository
     await _httpClient.delete(
         "${BackendlessPaths.bulkRoomParticipantsPath}?where=roomId%20%3D%20%27$chatRoomId%27");
 
-    final rows = RoomParticipant.fromDomain(participants, chatRoomId);
+    final rows = RoomParticipant.fromDomain(participants, chatRoomId)
+        .map((e) => e.toMap())
+        .toList();
 
     await _httpClient.post(
       BackendlessPaths.bulkRoomParticipantsPath,
-      data: rows.map((e) => e.toMap()),
+      data: rows,
+    );
+  }
+
+  Future<void> _setChatRoomName(ChatRoomMetadata metadata) async {
+    await _httpClient.delete(
+        "${BackendlessPaths.bulkRoomPath}?where=roomId%20%3D%20%27${metadata.chatRoomId}%27");
+
+    _httpClient.post(
+      BackendlessPaths.roomsPath,
+      data: Room.fromDomain(metadata).toMap(),
     );
   }
 }

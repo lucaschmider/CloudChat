@@ -9,6 +9,7 @@ class BackendlessPaths {
   static String get roomsPath => tablePath("rooms");
   static String get roomMessagesPath => tablePath("room_messages");
   static String get roomParticipantsPath => tablePath("room_participants");
-  static String get bulkRoomPath => tablePath("rooms");
-  static String get bulkRoomParticipantsPath => tablePath("room_participants");
+  static String get bulkRoomPath => bulkTablePath("rooms");
+  static String get bulkRoomParticipantsPath =>
+      bulkTablePath("room_participants");
 }
