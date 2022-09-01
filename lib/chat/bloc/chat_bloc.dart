@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../logger.dart';
@@ -48,10 +49,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       add(ChatLogout());
       return;
     }
+
+    final selectedChatRoom = state.chatRoomOptions.where((e) => e.isSelected);
+    final chatRoomOptions = selectedChatRoom.isEmpty
+        ? event.chatRoomOptions!
+        : event.chatRoomOptions!
+            .map(
+              (e) => ChatRoomOption(
+                isSelected: e.chatRoomId == selectedChatRoom.single.chatRoomId,
+                chatRoomId: e.chatRoomId,
+                name: e.name,
+              ),
+            )
+            .toList();
+
     if (state is ChatInitial) {
       add(ChatLogin(
         user: event.user!,
-        chatRoomOptions: event.chatRoomOptions!,
+        chatRoomOptions: chatRoomOptions,
       ));
       return;
     }
@@ -61,7 +76,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         sender: event.user!,
         chatRoom: state.chatRoom,
         messages: state.messages,
-        chatRoomOptions: event.chatRoomOptions!,
+        chatRoomOptions: chatRoomOptions,
       ));
       return;
     }
@@ -69,7 +84,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (state is ChatUserAvailable) {
       emit(ChatUserAvailable(
         sender: event.user!,
-        chatRoomOptions: event.chatRoomOptions!,
+        chatRoomOptions: chatRoomOptions,
       ));
       return;
     }
@@ -79,7 +94,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         sender: event.user!,
         chatRoom: state.chatRoom,
         messages: state.messages,
-        chatRoomOptions: event.chatRoomOptions!,
+        chatRoomOptions: chatRoomOptions,
         allUsers: (state as ChatRoomEditMode).allUsers,
       ));
     }
