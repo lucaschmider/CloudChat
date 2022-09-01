@@ -27,7 +27,7 @@ class RoomMessage {
     );
   }
 
-  static List<RoomMessage> fromMaps(List<Map<String, dynamic>> inputs) =>
+  static List<RoomMessage> fromMaps(List<dynamic> inputs) =>
       inputs.map((e) => fromMap(e)).toList();
 
   static RoomMessage fromDomain(

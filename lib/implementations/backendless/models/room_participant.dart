@@ -20,7 +20,7 @@ class RoomParticipant {
     return users.map((e) => RoomParticipant._(chatRoomId, e.userId)).toList();
   }
 
-  static List<RoomParticipant> fromMaps(List<Map<String, dynamic>> inputs) =>
+  static List<RoomParticipant> fromMaps(List<dynamic> inputs) =>
       inputs.map((e) => fromMap(e)).toList();
 
   Map<String, dynamic> toMap() {

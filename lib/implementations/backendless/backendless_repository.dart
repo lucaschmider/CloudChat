@@ -21,22 +21,27 @@ import 'package:rxdart/subjects.dart';
 
 import '../../bloc/authentification_repository.dart';
 import '../../chat/bloc/chat_repository.dart';
+import '../../logger.dart';
 
 class BackendlessRepository
     implements ChatRepository, AuthenticationRepository {
   final _httpClient =
       Dio(BaseOptions(baseUrl: "https://suavewall.backendless.app"));
+  final Logger _logger;
 
   final _signOutSubject = PublishSubject<void>();
-  String? _token;
-  String? currentUserId;
+  static String? _token;
+  static String? currentUserId = "Initial";
 
-  BackendlessRepository() {
+  BackendlessRepository(this._logger) {
     _httpClient.interceptors.add(ReauthenticationInterceptor(
       onReauthenticationRequired: () => _signOutSubject.add(null),
     ));
     _httpClient.interceptors.add(AutomaticTokenInterceptor(
-      onTokenReceived: (token) => _token = token,
+      onTokenReceived: (token) {
+        _logger.info("Received new token: $token");
+        _token = token;
+      },
       onTokenRequired: () => _token,
     ));
     _httpClient.interceptors.add(DefaultHeaderInterceptor(
@@ -99,7 +104,8 @@ class BackendlessRepository
 
   @override
   Stream<UserChangedEvent> getUserStream() =>
-      Stream.periodic(const Duration(milliseconds: 500)).asyncMap((_) async {
+      Stream.periodic(const Duration(milliseconds: 500)).asyncMap((trip) async {
+        if (currentUserId == null) return const UserChangedEvent(null, null);
         final responses = await Future.wait([
           _httpClient.get(
               "${BackendlessPaths.userPath}?where=userId%20%3D%20%27$currentUserId%27"),
@@ -143,10 +149,13 @@ class BackendlessRepository
   @override
   Future<AuthentificationResult> signInWithUsernameAndPasswordAsync(
       String username, String password) async {
-    await _httpClient.post(BackendlessPaths.loginPath, data: {
+    final response = await _httpClient.post(BackendlessPaths.loginPath, data: {
       "login": username,
       "password": password,
     });
+
+    currentUserId = response.data["objectId"];
+    _logger.info("Performed login for user with id $currentUserId");
     return AuthentificationResult.success;
   }
 

@@ -24,7 +24,7 @@ class Room {
     };
   }
 
-  static List<Room> fromMaps(List<Map<String, dynamic>> input) =>
+  static List<Room> fromMaps(List<dynamic> input) =>
       input.map((e) => Room.fromMap(e)).toList();
 
   String getWhereClause() {

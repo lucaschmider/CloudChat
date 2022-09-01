@@ -13,7 +13,7 @@ class User {
     );
   }
 
-  static List<User> fromMaps(List<Map<String, dynamic>> inputs) =>
+  static List<User> fromMaps(List<dynamic> inputs) =>
       inputs.map((e) => fromMap(e)).toList();
 
   Map<String, dynamic> toMap() {
