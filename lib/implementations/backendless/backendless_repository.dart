@@ -165,8 +165,7 @@ class BackendlessRepository
   @override
   Future<AuthentificationResult> signUpWithUsernameAndPassword(
       String username, String password) async {
-    final response =
-        await _httpClient.post(BackendlessPaths.registerPath, data: {
+    await _httpClient.post(BackendlessPaths.registerPath, data: {
       "email": username,
       "password": password,
     });
