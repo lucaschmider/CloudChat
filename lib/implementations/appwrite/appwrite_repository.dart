@@ -1,3 +1,5 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:cloud_chat/chat/bloc/models/user_changed_event.dart';
 
 import 'package:cloud_chat/chat/bloc/models/initial_chat_room_state.dart';
@@ -9,11 +11,22 @@ import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_message.dart';
 
 import 'package:cloud_chat/bloc/models/authentification_result.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../bloc/authentification_repository.dart';
 import '../../chat/bloc/chat_repository.dart';
 
 class AppwriteRepository implements ChatRepository, AuthenticationRepository {
+  final _client = Client();
+
+  AppwriteRepository() {
+    _client
+        .setEndpoint('http://13.73.148.57/v1')
+        .setProject('630cb8e5d2403e179f24');
+  }
+
+  late final _auth = Account(_client);
+
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
     // TODO: implement createMessage
@@ -64,9 +77,14 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
 
   @override
   Future<AuthentificationResult> signInWithUsernameAndPasswordAsync(
-      String username, String password) {
-    // TODO: implement signInWithUsernameAndPasswordAsync
-    throw UnimplementedError();
+      String username, String password) async {
+    try {
+      await _auth.createEmailSession(email: username, password: password);
+      return Future.value(AuthentificationResult.success);
+    } catch (e) {
+      print(e.toString());
+      return AuthentificationResult.unknownError;
+    }
   }
 
   @override
@@ -77,9 +95,18 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
 
   @override
   Future<AuthentificationResult> signUpWithUsernameAndPassword(
-      String username, String password) {
-    // TODO: implement signUpWithUsernameAndPassword
-    throw UnimplementedError();
+      String username, String password) async {
+    try {
+      await _auth.create(
+        userId: const Uuid().v4(),
+        email: username,
+        password: password,
+      );
+      return Future.value(AuthentificationResult.success);
+    } catch (e) {
+      print(e.toString());
+      return AuthentificationResult.unknownError;
+    }
   }
 
   @override
