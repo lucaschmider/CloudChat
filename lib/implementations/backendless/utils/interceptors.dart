@@ -32,7 +32,9 @@ class AutomaticTokenInterceptor extends InterceptorsWrapper {
           },
           onRequest: (request, handler) {
             final token = onTokenRequired();
-            request.headers["user-token"] = token;
+            if (token != null) {
+              request.headers["user-token"] = token;
+            }
             return handler.next(request);
           },
         );
