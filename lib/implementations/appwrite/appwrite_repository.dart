@@ -18,14 +18,14 @@ import '../../chat/bloc/chat_repository.dart';
 
 class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   final _client = Client();
+  late final _auth = Account(_client);
 
   AppwriteRepository() {
     _client
-        .setEndpoint('http://13.73.148.57/v1')
-        .setProject('630cb8e5d2403e179f24');
+        .setEndpoint('https://13.73.148.57/v1')
+        .setProject('630cb8e5d2403e179f24')
+        .setSelfSigned(status: false);
   }
-
-  late final _auth = Account(_client);
 
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
@@ -34,10 +34,7 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   }
 
   @override
-  Stream<void> createSignOutStream() {
-    // TODO: implement createSignOutStream
-    throw UnimplementedError();
-  }
+  Stream<void> createSignOutStream() => Stream.empty();
 
   @override
   Future<List<ChatUser>> getAllUsers() {
@@ -64,10 +61,7 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   }
 
   @override
-  Future<bool> isCurrentProfileCompleted() {
-    // TODO: implement isCurrentProfileCompleted
-    throw UnimplementedError();
-  }
+  Future<bool> isCurrentProfileCompleted() => Future.value(false);
 
   @override
   Future<void> setFullName(String fullName) {
@@ -79,8 +73,10 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   Future<AuthentificationResult> signInWithUsernameAndPasswordAsync(
       String username, String password) async {
     try {
-      await _auth.createEmailSession(email: username, password: password);
-      return Future.value(AuthentificationResult.success);
+      final session =
+          await _auth.createEmailSession(email: username, password: password);
+      print("Success: $session");
+      return AuthentificationResult.success;
     } catch (e) {
       print(e.toString());
       return AuthentificationResult.unknownError;
@@ -97,12 +93,13 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   Future<AuthentificationResult> signUpWithUsernameAndPassword(
       String username, String password) async {
     try {
-      await _auth.create(
+      final user = await _auth.create(
         userId: const Uuid().v4(),
         email: username,
         password: password,
       );
-      return Future.value(AuthentificationResult.success);
+      print("Success: $user");
+      return AuthentificationResult.success;
     } catch (e) {
       print(e.toString());
       return AuthentificationResult.unknownError;
