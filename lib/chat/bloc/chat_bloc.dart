@@ -1,17 +1,14 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../logger.dart';
 import 'models/chat_message.dart';
 import 'models/chat_room_metadata.dart';
 import 'models/chat_user.dart';
-import 'models/user_changed_event.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';
