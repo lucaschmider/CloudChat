@@ -60,7 +60,7 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
     return _instance;
   }
 
-// ToDo: Permissions müssen immer gesetzt sein => role:all muss hinzugefügt werden
+// TODO: Permissions müssen immer gesetzt sein => role:all muss hinzugefügt werden
   AppwriteRepository(this._logger)
       : _client = Client()
             .setEndpoint('http://13.73.148.57/v1')
@@ -69,12 +69,12 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   void _updateRealtime(String chatRoomId) {
     _realtimeSubscription?.cancel();
 
-    // ToDo: Mechanismus gut übernommen, manuelles aufteilen der Events ist notwendig
+    // TODO: Mechanismus gut übernommen, manuelles aufteilen der Events ist notwendig
     _realtimeSubscription = _realtime
         .subscribe([
-          // ToDo: Realtime API nicht so mächtig wie firebase, neuladen notwendig um mitzubekommen, wenn neuer raum verfügbar ist
-          // ToDo: Alternative wäre die speicherung der Räume mit zugriff im profil => Raumupdate führt zu Update in allen User Dokumenten
-          // ToDo: Deshalb muss neugeladen werden um neuen raum zu sehen
+          // TODO: Realtime API nicht so mächtig wie firebase, neuladen notwendig um mitzubekommen, wenn neuer raum verfügbar ist
+          // TODO: Alternative wäre die speicherung der Räume mit zugriff im profil => Raumupdate führt zu Update in allen User Dokumenten
+          // TODO: Deshalb muss neugeladen werden um neuen raum zu sehen
           "databases.$databaseId.collections.$roomCollection.documents.$chatRoomId",
           "databases.$databaseId.collections.$roomMessageCollection.documents",
         ])
@@ -99,7 +99,7 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
     );
   }
 
-// ToDo: Es gibt keine Clientseitige Api um alle Nutzer zu laden, serverseitig möglich
+// TODO: Es gibt keine Clientseitige Api um alle Nutzer zu laden, serverseitig möglich
   @override
   Future<List<ChatUser>> getAllUsers() async {
     final execution = await _functions.createExecution(
@@ -114,7 +114,7 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
 
   @override
   Future<InitialChatRoomState> getChatRoom(String chatRoomId) async {
-    // ToDo: Index erforderlich um suche zu starten
+    // TODO: Index erforderlich um suche zu starten
     final responses = await Future.wait([
       _database.getDocument(
         collectionId: roomCollection,
@@ -148,8 +148,8 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
 
   @override
   Stream<UserChangedEvent> getUserStream() =>
-      // ToDo: Functions Architektur seltsam, eigenes node projekt pro function => sehr großer speicher platz während der entwicklung (npm)
-      // ToDo: Query API nicht so mächtig, lade alle Dokumente und filtere lokal
+      // TODO: Functions Architektur seltsam, eigenes node projekt pro function => sehr großer speicher platz während der entwicklung (npm)
+      // TODO: Query API nicht so mächtig, lade alle Dokumente und filtere lokal
       userChangedSubject.asyncMap((event) async {
         _logger.info("User Changed Map");
         final currentUser = await _auth.get();
@@ -226,7 +226,7 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
         password: password,
       );
       _logger.info("Successfully signed up in as $username");
-      // ToDo: Kein automatischer login wenn man sich registriert
+      // TODO: Kein automatischer login wenn man sich registriert
       final result =
           await signInWithUsernameAndPasswordAsync(username, password);
 
@@ -242,10 +242,10 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   Future<void> updateChatRoom(ChatRoomMetadata metadata) async {
     final data = DatabaseMappers.mapChatRoomMetadata(metadata);
 
-    // ToDo: Exception muss zur Flusssteuerung verwendet werden, da keine API existiert um die Existenz eines Dokuments zu prüfen und update nicht genutzt werden kann um Dokumente zu erstellen.
-    // ToDo: Schema muss angegeben werden obwohl "no sql" datenbank => in wahrheit ist maria db im hintergrund (zu sehen in der docker-compose.yml)
+    // TODO: Exception muss zur Flusssteuerung verwendet werden, da keine API existiert um die Existenz eines Dokuments zu prüfen und update nicht genutzt werden kann um Dokumente zu erstellen.
+    // TODO: Schema muss angegeben werden obwohl "no sql" datenbank => in wahrheit ist maria db im hintergrund (zu sehen in der docker-compose.yml)
     try {
-      final current = await _database.getDocument(
+      await _database.getDocument(
         collectionId: roomCollection,
         documentId: metadata.chatRoomId,
       );
