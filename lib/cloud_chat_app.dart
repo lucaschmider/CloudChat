@@ -32,7 +32,8 @@ class CloudChatApp extends StatelessWidget {
           providers: [
             RepositoryProvider<BackendConnectorRepository>(
                 create: (context) => BackendConnectorRegistry()),
-            RepositoryProvider<Logger>(create: (context) => ConsoleLogger()),
+            RepositoryProvider<Logger>(
+                create: (context) => const ConsoleLogger()),
           ],
           child: BlocProvider(
             create: (context) => CloudChatBloc(

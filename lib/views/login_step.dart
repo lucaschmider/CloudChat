@@ -1,8 +1,6 @@
 import 'package:cloud_chat/views/custom_button.dart';
 import 'package:cloud_chat/views/custom_text_input.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class LoginStep extends StatefulWidget {
   final void Function(String userName, String password) onPasswordLogin;

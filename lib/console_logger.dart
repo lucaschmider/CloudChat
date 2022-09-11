@@ -1,7 +1,9 @@
 import 'package:cloud_chat/logger.dart';
 import 'package:flutter/foundation.dart';
 
+@immutable
 class ConsoleLogger extends Logger {
+  const ConsoleLogger();
   @override
   void error(String message, {Error? error, Exception? exception}) {
     if (kDebugMode) {

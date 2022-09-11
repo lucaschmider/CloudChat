@@ -1,4 +1,3 @@
-import 'package:cloud_chat/chat/bloc/models/chat_room_metadata.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_user.dart';
 import 'package:cloud_chat/implementations/backendless/models/user.dart';
 

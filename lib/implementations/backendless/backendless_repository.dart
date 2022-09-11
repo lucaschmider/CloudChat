@@ -17,7 +17,6 @@ import 'package:cloud_chat/implementations/backendless/models/user.dart';
 import 'package:cloud_chat/implementations/backendless/utils/backendless_paths.dart';
 import 'package:cloud_chat/implementations/backendless/utils/interceptors.dart';
 import 'package:dio/dio.dart';
-import 'package:rxdart/subjects.dart';
 
 import '../../bloc/authentification_repository.dart';
 import '../../chat/bloc/chat_repository.dart';
@@ -29,14 +28,10 @@ class BackendlessRepository
       Dio(BaseOptions(baseUrl: "https://suavewall.backendless.app"));
   final Logger _logger;
 
-  final _signOutSubject = PublishSubject<void>();
   static String? _token;
   static String? currentUserId = "Initial";
 
   BackendlessRepository(this._logger) {
-    _httpClient.interceptors.add(ReauthenticationInterceptor(
-      onReauthenticationRequired: () => _signOutSubject.add(null),
-    ));
     _httpClient.interceptors.add(AutomaticTokenInterceptor(
       onTokenReceived: (token) {
         _logger.info("Received new token: $token");
@@ -59,9 +54,6 @@ class BackendlessRepository
       data: row.toMap(),
     );
   }
-
-  @override
-  Stream<void> createSignOutStream() => _signOutSubject.asBroadcastStream();
 
   @override
   Future<List<ChatUser>> getAllUsers() async {

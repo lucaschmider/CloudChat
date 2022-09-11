@@ -1,0 +1,36 @@
+{
+    "projectId": "630cb8e5d2403e179f24",
+    "projectName": "Cloud Chat",
+    "functions": [
+        {
+            "$id": "getAllUsers",
+            "name": "Get All Users",
+            "runtime": "node-16.0",
+            "path": "functions/Get All Users",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        },
+        {
+            "$id": "getMyRooms",
+            "name": "Get Room with access",
+            "runtime": "node-16.0",
+            "path": "functions/Get Room with access",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}

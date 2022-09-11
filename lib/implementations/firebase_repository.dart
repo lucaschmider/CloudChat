@@ -25,10 +25,6 @@ class FirebaseRepository implements ChatRepository, AuthenticationRepository {
   }
 
   @override
-  Stream<void> createSignOutStream() =>
-      _auth.userChanges().where((event) => event == null);
-
-  @override
   Future<InitialChatRoomState> getChatRoom(String chatRoomId) async {
     final path = "rooms/$chatRoomId";
     final roomSnapshot = await _firestore.doc(path).get();
