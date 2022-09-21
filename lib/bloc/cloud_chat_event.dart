@@ -45,6 +45,3 @@ class CloudChatProfileCompleted extends CloudChatEvent {
     required this.fullName,
   });
 }
-
-@immutable
-class CloudChatSignOutRequested extends CloudChatEvent {}

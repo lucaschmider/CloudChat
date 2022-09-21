@@ -11,7 +11,6 @@ abstract class AuthenticationRepository {
   );
   Future<void> signOut();
 
-  Stream<void> createSignOutStream();
   Future<bool> isCurrentProfileCompleted();
   Future<void> setFullName(String fullName);
 }

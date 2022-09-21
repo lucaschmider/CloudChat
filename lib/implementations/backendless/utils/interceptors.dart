@@ -1,22 +1,5 @@
-import 'dart:html';
-
 import 'package:cloud_chat/implementations/backendless/utils/backendless_paths.dart';
 import 'package:dio/dio.dart';
-
-class ReauthenticationInterceptor extends InterceptorsWrapper {
-  ReauthenticationInterceptor({
-    required void Function() onReauthenticationRequired,
-  }) : super(
-          onError: (error, handler) {
-            if (error.response?.statusCode == HttpStatus.forbidden) {
-              onReauthenticationRequired();
-              return;
-            }
-
-            return handler.next(error);
-          },
-        );
-}
 
 class AutomaticTokenInterceptor extends InterceptorsWrapper {
   AutomaticTokenInterceptor({

@@ -24,7 +24,6 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     on<CloudChatBackendConnectorsRetrieved>(_handleConnectorsRetrieved);
     on<CloudChatBackendSelected>(_handleBackendSelection);
     on<CloudChatPasswordLoginRequested>(_handlePasswordLogin);
-    on<CloudChatSignOutRequested>(_handleSignOut);
     on<CloudChatProfileCompleted>(_handleProfileCompletion);
     on<CloudChatUserCreated>(_handleUserCreation);
 
@@ -94,28 +93,6 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     ));
   }
 
-  void _handleSignOut(event, emit) async {
-    if (state is! CloudChatSignedIn) {
-      logger.warn(
-          "State transition 'CloudChatSignOutRequested' is only valid from state 'CloudChatSignedIn.'");
-      return;
-    }
-
-    emit(CloudChatSignedIn(
-      availableConnectors: state.availableConnectors,
-      connector: state.connector,
-      isLoading: true,
-    ));
-
-    await authentificationRepository!.signOut();
-
-    emit(CloudChatConnected(
-      availableConnectors: state.availableConnectors,
-      connector: state.connector,
-      isLoading: false,
-    ));
-  }
-
   void _handlePasswordLogin(event, emit) async {
     if (authentificationRepository == null) {
       logger.warn(
@@ -163,10 +140,6 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     final connector =
         state.availableConnectors.singleWhere((con) => con.name == event.name);
     authentificationRepository = connector.authenticationRepository();
-
-    signOutSubscription = authentificationRepository!
-        .createSignOutStream()
-        .listen((_) => add(CloudChatSignOutRequested()));
 
     emit(CloudChatConnected(
       availableConnectors: state.availableConnectors,

@@ -1,17 +1,14 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_chat/chat/bloc/chat_repository.dart';
 import 'package:cloud_chat/chat/bloc/models/chat_room_option.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../logger.dart';
 import 'models/chat_message.dart';
 import 'models/chat_room_metadata.dart';
 import 'models/chat_user.dart';
-import 'models/user_changed_event.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';
@@ -37,11 +34,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ChatEditCompleted>(_handleChatRoomEditCompleted);
     on<ChatAllUsersRetrieved>(_handleAllUsersRetrieved);
     on<ChatUserChanged>(_handleChatUserChanged);
-    userSubscription =
-        repository.getUserStream().listen((event) => add(ChatUserChanged(
-              chatRoomOptions: event.chatRoomOptions,
-              user: event.user,
-            )));
+    userSubscription = repository.getUserStream().listen((event) {
+      print("User Changed");
+      add(ChatUserChanged(
+        chatRoomOptions: event.chatRoomOptions,
+        user: event.user,
+      ));
+    });
   }
 
   void _handleChatUserChanged(ChatUserChanged event, Emitter<ChatState> emit) {
