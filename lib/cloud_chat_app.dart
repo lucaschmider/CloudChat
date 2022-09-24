@@ -43,11 +43,20 @@ class CloudChatApp extends StatelessWidget {
             child: BlocBuilder<CloudChatBloc, CloudChatState>(
               builder: (context, state) {
                 if (state is CloudChatSignedIn) {
-                  return RepositoryProvider<ChatRepository>(
-                    create: (context) =>
-                        state.connector!.chatRepositoryFactory(),
-                    child: const ChatPage(),
-                  );
+                  return FutureBuilder(
+                      future: state.connector!.chatRepositoryFactory(),
+                      builder:
+                          (context, AsyncSnapshot<ChatRepository> snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return RepositoryProvider<ChatRepository>(
+                          create: (context) => snapshot.data!,
+                          child: const ChatPage(),
+                        );
+                      });
                 }
 
                 return const InitializationPage();

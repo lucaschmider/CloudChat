@@ -34,13 +34,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ChatEditCompleted>(_handleChatRoomEditCompleted);
     on<ChatAllUsersRetrieved>(_handleAllUsersRetrieved);
     on<ChatUserChanged>(_handleChatUserChanged);
-    userSubscription = repository.getUserStream().listen((event) {
-      print("User Changed");
-      add(ChatUserChanged(
-        chatRoomOptions: event.chatRoomOptions,
-        user: event.user,
-      ));
-    });
+    userSubscription =
+        repository.getUserStream().listen((event) => add(ChatUserChanged(
+              chatRoomOptions: event.chatRoomOptions,
+              user: event.user,
+            )));
   }
 
   void _handleChatUserChanged(ChatUserChanged event, Emitter<ChatState> emit) {

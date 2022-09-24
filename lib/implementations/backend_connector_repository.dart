@@ -16,14 +16,16 @@ class BackendConnectorRegistry implements BackendConnectorRepository {
       BackendConnector(
         name: "Backendless",
         assetName: "anchor.svg",
-        chatRepositoryFactory: () => BackendlessRepository(_logger),
-        authenticationRepository: () => BackendlessRepository(_logger),
+        chatRepositoryFactory: () =>
+            Future.value(BackendlessRepository(_logger)),
+        authenticationRepository: () =>
+            Future.value(BackendlessRepository(_logger)),
       ),
       BackendConnector(
         name: "Firebase",
         assetName: "layers.svg",
-        chatRepositoryFactory: () => FirebaseRepository(),
-        authenticationRepository: () => FirebaseRepository(),
+        chatRepositoryFactory: () => Future.value(FirebaseRepository()),
+        authenticationRepository: () => Future.value(FirebaseRepository()),
       ),
       BackendConnector(
         name: "Appwrite",

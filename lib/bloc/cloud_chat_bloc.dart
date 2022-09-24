@@ -129,7 +129,7 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
   }
 
   void _handleBackendSelection(
-      CloudChatBackendSelected event, Emitter<CloudChatState> emit) {
+      CloudChatBackendSelected event, Emitter<CloudChatState> emit) async {
     if (state.availableConnectors.isEmpty) {
       logger.warn(
           "State transition 'CloudChatBackendSelected' is only valid while connectors are known.");
@@ -139,7 +139,7 @@ class CloudChatBloc extends Bloc<CloudChatEvent, CloudChatState> {
     signOutSubscription?.cancel();
     final connector =
         state.availableConnectors.singleWhere((con) => con.name == event.name);
-    authentificationRepository = connector.authenticationRepository();
+    authentificationRepository = await connector.authenticationRepository();
 
     emit(CloudChatConnected(
       availableConnectors: state.availableConnectors,
