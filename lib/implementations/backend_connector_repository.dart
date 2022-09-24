@@ -16,7 +16,7 @@ class BackendConnectorRegistry implements BackendConnectorRepository {
     return [
       BackendConnector(
         name: "Backendless",
-        assetName: "anchor.svg",
+        assetName: "backendless.svg",
         chatRepositoryFactory: () =>
             Future.value(BackendlessRepository(_logger)),
         authenticationRepository: () =>
@@ -24,13 +24,13 @@ class BackendConnectorRegistry implements BackendConnectorRepository {
       ),
       BackendConnector(
         name: "Firebase",
-        assetName: "layers.svg",
+        assetName: "Firebase_Logo.svg",
         chatRepositoryFactory: () => Future.value(FirebaseRepository()),
         authenticationRepository: () => Future.value(FirebaseRepository()),
       ),
       BackendConnector(
         name: "Appwrite",
-        assetName: "layers.svg",
+        assetName: "appwrite.svg",
         chatRepositoryFactory: () =>
             Future.value(AppwriteRepository.getInstance(_logger)),
         authenticationRepository: () =>
@@ -38,7 +38,7 @@ class BackendConnectorRegistry implements BackendConnectorRepository {
       ),
       BackendConnector(
         name: "Supabase",
-        assetName: "layers.svg",
+        assetName: "supabase-logo-vector.svg",
         chatRepositoryFactory: () => SupabaseRepository.getInstance(),
         authenticationRepository: () => SupabaseRepository.getInstance(),
       ),
