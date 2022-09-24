@@ -39,7 +39,6 @@ class SupabaseRepository implements AuthenticationRepository, ChatRepository {
 
   @override
   Future<void> createMessage(String chatRoomId, ChatMessage message) {
-    print("Create Message");
     final row = ChatRoomMessage.fromDomain(message, chatRoomId);
     return _supabase
         .from(SupabaseKey.messageTable)
@@ -226,16 +225,16 @@ class SupabaseRepository implements AuthenticationRepository, ChatRepository {
     final roomRow = ChatRoom.fromDomain(metadata);
     final participantRows = ChatRoomParticipant.fromDomain(metadata);
 
-    final r = await _supabase
+    await _supabase
         .from(SupabaseKey.roomTable)
         .upsert(roomRow.toMap())
         .execute();
-    final l = await _supabase
+    await _supabase
         .from(SupabaseKey.chatRoomParticipantTable)
         .delete()
         .eq(SupabaseKey.chatRoomIdColumn, metadata.chatRoomId)
         .execute();
-    final s = await _supabase
+    await _supabase
         .from(SupabaseKey.chatRoomParticipantTable)
         .insert(participantRows.map((e) => e.toMap()).toList())
         .execute();
