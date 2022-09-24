@@ -2,6 +2,7 @@ import 'package:cloud_chat/bloc/backend_connector_repository.dart';
 import 'package:cloud_chat/console_logger.dart';
 import 'package:cloud_chat/implementations/appwrite/appwrite_repository.dart';
 import 'package:cloud_chat/implementations/backendless/backendless_repository.dart';
+import 'package:cloud_chat/implementations/supabase/supabase_repository.dart';
 import 'package:cloud_chat/logger.dart';
 
 import '../bloc/models/backend_connector.dart';
@@ -30,8 +31,16 @@ class BackendConnectorRegistry implements BackendConnectorRepository {
       BackendConnector(
         name: "Appwrite",
         assetName: "layers.svg",
-        chatRepositoryFactory: () => AppwriteRepository.getInstance(_logger),
-        authenticationRepository: () => AppwriteRepository.getInstance(_logger),
+        chatRepositoryFactory: () =>
+            Future.value(AppwriteRepository.getInstance(_logger)),
+        authenticationRepository: () =>
+            Future.value(AppwriteRepository.getInstance(_logger)),
+      ),
+      BackendConnector(
+        name: "Supabase",
+        assetName: "layers.svg",
+        chatRepositoryFactory: () => SupabaseRepository.getInstance(),
+        authenticationRepository: () => SupabaseRepository.getInstance(),
       ),
     ];
   }

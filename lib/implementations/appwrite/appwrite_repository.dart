@@ -55,9 +55,9 @@ class AppwriteRepository implements ChatRepository, AuthenticationRepository {
   final userChangedSubject = PublishSubject<String>(
       onListen: () => print("Listening to userChangedSubject"));
 
-  static getInstance(Logger logger) {
+  static AppwriteRepository getInstance(Logger logger) {
     _instance ??= AppwriteRepository(logger);
-    return _instance;
+    return _instance!;
   }
 
 // TODO: Permissions müssen immer gesetzt sein => role:all muss hinzugefügt werden
